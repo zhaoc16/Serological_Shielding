@@ -512,7 +512,7 @@ seir_model_shields_rcfc <- function(t, x, RM_p) {
     dE.e.pos = (1-specificity)*test.e*E.e + foi.e.pos*S.e.pos - gamma_e*E.e.pos 
     dIs.e.pos = gamma_e*E.e.pos*p - gamma_s*Is.e.pos
     dIa.e.pos = (1-specificity)*test.e*Ia.e + gamma_e*E.e.pos*(1-p) - gamma_a*Ia.e.pos
-    dR.e.pos = sensitivity*test.e*R.e + sensitivity*gamma_h*Hc.e*(1-crit_die) + sensitivity*gamma_h*Hs.e +
+    dR.e.pos = sensitivity*test.e*R.e + sensitivity*gamma_h*test.switch2*Hc.e*(1-crit_die) + sensitivity*gamma_h*test.switch2*Hs.e +
       (1-hosp_frac[3])*gamma_s*Is.e.pos + gamma_a*Ia.e.pos
     
     
@@ -613,11 +613,10 @@ crit_die=0.5
 sensitivity=0.90
 specificity=0.999
 
-#Pulse functions
 testvec<-rep(0, 366)
 times <- seq(0, 365, length = 366)
 
-start.time.test<-45 #can change when in the outbreak testing becomes available
+start.time.test<-365 #can change when in the outbreak testing becomes available
 start.time.distance<-30
 start.time.target<-50
 
@@ -668,7 +667,7 @@ e.testdat<-data.frame(times=times, test.e=testvec.e)
 #Might want a ramp up period for these, ignore for now
 tswitch1.dat<-data.frame(times=times, test.switch1=c(rep(1, start.time.test+1),
                                                      rep(0, length(times)-(start.time.test+1))))
-tswitch2.dat<-data.frame(times=times, test.switch1=c(rep(0, start.time.test+1),
+tswitch2.dat<-data.frame(times=times, test.switch2=c(rep(0, start.time.test+1),
                                                      rep(1, length(times)-(start.time.test+1))))
 
 cfxn<- approxfun(c.testdat$times, c.testdat$test.c, rule = 2)
@@ -771,3 +770,4 @@ ggplot()+#geom_line(data=null.model, aes(x=time, y=CriticalCare))+
   labs(x='time', y='Critical Care Cases')
 
 #These lines are on top of each other but start to diverge when targeting begins earlier
+sw2fxn(t)
