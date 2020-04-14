@@ -612,10 +612,8 @@ crit_die=0.5
 #For Wantai total antibody ELISA, make specificity slightly less than 1
 sensitivity=0.90
 specificity=0.999
-```
 
-Define testing functions
-```{r pulse functions, echo=TRUE}
+#Pulse functions
 testvec<-rep(0, 366)
 times <- seq(0, 365, length = 366)
 
