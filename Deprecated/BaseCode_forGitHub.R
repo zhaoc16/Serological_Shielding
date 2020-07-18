@@ -95,6 +95,7 @@ seir_model_shields_rcfc_nolatent <- function(t, x, params) {
   Ia.e.pos = x[64]
   R.e.pos = x[65]  
   
+  print(Ia.c)
   
   #Number of infections at time t for each subgroup
   infec.c.gen = asymp.red*Ia.c + Is.c
@@ -107,6 +108,10 @@ seir_model_shields_rcfc_nolatent <- function(t, x, params) {
   infec.fc.pos= asymp.red*Ia.fc.pos + Is.fc.pos
   infec.e.gen = asymp.red*Ia.e + Is.e  
   infec.e.pos = asymp.red*Ia.e.pos+ Is.e.pos 
+  
+  # print(c(infec.c.gen, infec.c.pos, infec.a.gen, infec.a.pos
+  #         , infec.rc.gen, infec.rc.pos, infec.fc.gen, infec.fc.pos
+  #         , infec.e.gen, infec.e.pos))
   
   #Population sizes/testing status at time t    
   tot.c = sum(S.c, E.c, Is.c, Ia.c, Hs.c, Hc.c, D.c, R.c, 
@@ -527,9 +532,13 @@ seir_model_shields_rcfc_nolatent <- function(t, x, params) {
   dHs.fc = gamma_s*Is.fc*(hosp_frac[2]-hosp_crit[2]) + gamma_s*Is.fc.pos*(hosp_frac[2]-hosp_crit[2]) - gamma_h*Hs.fc
   dHc.fc = gamma_s*Is.fc*hosp_crit[2] + gamma_s*Is.fc.pos*hosp_crit[2]- gamma_h*Hc.fc
   dD.fc = gamma_h*Hc.fc*crit_die[2]
-  dR.fc = (1-hosp_frac[2])*gamma_s*Is.fc + gamma_a*Ia.fc + (1-sensitivity)*test.switch2*gamma_h*Hs.fc + 
-    (1-sensitivity)*test.switch2*gamma_h*Hc.fc*(1-crit_die[2])  - sensitivity*test.fc*test.switch2*R.fc +
-    gamma_h*test.switch1*Hc.fc*(1-crit_die[2])+test.switch1*gamma_h*Hs.fc 
+  dR.fc = (1-hosp_frac[2])*gamma_s*Is.fc + 
+    gamma_a*Ia.fc + 
+    (1-sensitivity)*test.switch2*gamma_h*Hs.fc + 
+    (1-sensitivity)*test.switch2*gamma_h*Hc.fc*(1-crit_die[2])  - 
+    sensitivity*test.fc*test.switch2*R.fc +
+    gamma_h*test.switch1*Hc.fc*(1-crit_die[2]) +
+    test.switch1*gamma_h*Hs.fc 
   dS.fc.pos = (1-specificity)*test.fc*test.switch2*S.fc - foi.fc.pos*S.fc.pos 
   dE.fc.pos = (1-specificity)*test.fc*test.switch2*E.fc + foi.fc.pos*S.fc.pos - gamma_e*E.fc.pos 
   dIs.fc.pos = gamma_e*E.fc.pos*p - gamma_s*Is.fc.pos
@@ -544,17 +553,18 @@ seir_model_shields_rcfc_nolatent <- function(t, x, params) {
   dHs.e = gamma_s*Is.e*(hosp_frac[3]-hosp_crit[3]) + gamma_s*Is.e.pos*(hosp_frac[3]-hosp_crit[3]) - gamma_h*Hs.e
   dHc.e = gamma_s*Is.e*hosp_crit[3] + gamma_s*Is.e.pos*hosp_crit[3]- gamma_h*Hc.e
   dD.e = gamma_h*Hc.e*crit_die[3]
-  dR.e = (1-hosp_frac[3])*gamma_s*Is.a + gamma_a*Ia.e + (1-sensitivity)*test.switch2*gamma_h*Hs.e + 
-    (1-sensitivity)*test.switch2*gamma_h*Hc.e*(1-crit_die[3])  - sensitivity*test.e*test.switch2*R.e+
-    gamma_h*test.switch1*Hc.e*(1-crit_die[3])+test.switch1*gamma_h*Hs.e 
+  
+  dR.e = (1-hosp_frac[3])*gamma_s*Is.e +  gamma_a*Ia.e + 
+    (1-sensitivity)*test.switch2*gamma_h*Hs.e + (1-sensitivity)*test.switch2*gamma_h*Hc.e*(1-crit_die[3])  - 
+    sensitivity*test.e*test.switch2*R.e + gamma_h*test.switch1*Hc.e*(1-crit_die[3]) +
+    test.switch1*gamma_h*Hs.e 
+
   dS.e.pos = (1-specificity)*test.e*test.switch2*S.e - foi.e.pos*S.e.pos 
   dE.e.pos = (1-specificity)*test.e*test.switch2*E.e + foi.e.pos*S.e.pos - gamma_e*E.e.pos 
   dIs.e.pos = gamma_e*E.e.pos*p - gamma_s*Is.e.pos
   dIa.e.pos = (1-specificity)*test.e*test.switch2*Ia.e + gamma_e*E.e.pos*(1-p) - gamma_a*Ia.e.pos
   dR.e.pos = sensitivity*test.e*test.switch2*R.e + sensitivity*gamma_h*test.switch2*Hc.e*(1-crit_die[3]) + sensitivity*gamma_h*test.switch2*Hs.e +
     (1-hosp_frac[3])*gamma_s*Is.e.pos + gamma_a*Ia.e.pos
-  
-  
   
   res = c(dS.c, dE.c, dIs.c, dIa.c, dHs.c, dHc.c, dD.c, dR.c, dS.c.pos, dE.c.pos, dIs.c.pos, dIa.c.pos, dR.c.pos,
           dS.a, dE.a, dIs.a, dIa.a, dHs.a, dHc.a, dD.a, dR.a, dS.a.pos, dE.a.pos, dIs.a.pos, dIa.a.pos, dR.a.pos,
@@ -564,7 +574,16 @@ seir_model_shields_rcfc_nolatent <- function(t, x, params) {
           dS.fc.pos, dE.fc.pos, dIs.fc.pos, dIa.fc.pos, dR.fc.pos,
           dS.e, dE.e, dIs.e, dIa.e, dHs.e, dHc.e, dD.e, dR.e, dS.c.pos, dE.e.pos, dIs.e.pos, dIa.e.pos, dR.e.pos)
   
+  names(res) = c('dS.c', 'dE.c', 'dIs.c', 'dIa.c', 'dHs.c', 'dHc.c', 'dD.c', 'dR.c', 'dS.c.pos', 'dE.c.pos', 'dIs.c.pos', 'dIa.c.pos', 'dR.c.pos',
+          'dS.a', 'dE.a', 'dIs.a', 'dIa.a', 'dHs.a', 'dHc.a', 'dD.a', 'dR.a', 'dS.a.pos', 'dE.a.pos', 'dIs.a.pos', 'dIa.a.pos', 'dR.a.pos',
+          'dS.rc', 'dE.rc', 'dIs.rc', 'dIa.rc', 'dHs.rc', 'dHc.rc', 'dD.rc', 'dR.rc',
+          'dS.rc.pos', 'dE.rc.pos', 'dIs.rc.pos', 'dIa.rc.pos', 'dR.rc.pos',
+          'dS.fc', 'dE.fc', 'dIs.fc', 'dIa.fc', 'dHs.fc', 'dHc.fc', 'dD.fc', 'dR.fc',
+          'dS.fc.pos', 'dE.fc.pos', 'dIs.fc.pos', 'dIa.fc.pos', 'dR.fc.pos',
+          'dS.e', 'dE.e', 'dIs.e', 'dIa.e', 'dHs.e', 'dHc.e', 'dD.e', 'dR.e', 'dS.c.pos', 'dE.e.pos', 'dIs.e.pos', 'dIa.e.pos', 'dR.e.pos')
+  
   list(res)
+  print(res)
 }
 
 #Model parameters
@@ -608,10 +627,10 @@ prob.home<-0.316
 prob.full<-0.0565
 prob.reduced<-1-prob.full-prob.home
 #prob.reduced<-0.678
-preduced<-0.5
+preduced<-0.1
 pfull<-1
 sd.other<-0.25
-alpha<-1.2
+alpha<-4
 
 WorkContacts_5x5<-expand_5x5(oldmatrix=WorkContacts, 
                              phome=prob.home, preduced=prob.reduced, pfull=prob.full)
@@ -634,7 +653,7 @@ gamma_e=1/3     # Latent period (He et al)
 gamma_a=1/7     # Recovery rate, undocumented (Kissler et al)
 gamma_s=1/7    # Recovery rate, undocumented (Kissler et al)
 gamma_h=1/15    # Recovery rate, hospitalized cases (Zhou et al--China study)
-p=0.14           # Fraction 'Symptomatic'documented' (Shaman's paper)
+p=0.3           # Fraction 'Symptomatic'documented' (Shaman's paper)
 
 hosp_frac=c(0.061, 0.182, 0.417) #From MMWR
 hosp_crit=c(0, 0.063, 0.173) #From CDC, MMWR
@@ -712,23 +731,24 @@ params = c('agestruc'=agestruc,
            'p'=p, 'hosp_frac'=hosp_frac, 'hosp_crit'=hosp_crit, 'crit_die'=crit_die,
            'sensitivity'=sensitivity, 'specificity'=specificity) 
 
-model_out = ode(y = start, times = t, fun = seir_model_shields_rcfc_nolatent, parms = par, 
-                method='ode45')
-
-model_out<-as.data.frame(model_out)
-Infected<-N-sum(model_out$S.c[366], model_out$S.c.pos[366], model_out$S.a[366], model_out$S.a.pos[366], 
-                model_out$S.rc[366], model_out$S.rc.pos[366], model_out$S.fc[366], model_out$S.fc.pos[366],
-                model_out$S.e[366], model_out$S.e.pos[366])
-Pinfect<-Infected/N
-Infected; Pinfect
-Deaths<-sum(model_out$D.a[366], model_out$D.c[366], model_out$D.e[366], model_out$D.rc[366], 
-            model_out$D.fc[366])
-Deaths
-
-null.model<-ddply(model_out, .(time), summarize, 
-                  CriticalCare=sum(Hc.fc, Hc.rc, Hc.c, Hc.a, Hc.e, Hc.c),
-                  Deaths=sum(D.c, D.a, D.e, D.rc, D.fc),
-                  CI=(N-sum(S.c, S.c.pos, S.a, S.a.pos, S.rc, S.rc.pos, S.fc, S.fc.pos, S.e, S.e.pos))/N)
-plot(null.model$CriticalCare)
-
-null.model$Deaths[60]; null.model$Deaths[90]
+# model_out = ode(y = start, times = t, fun = seir_model_shields_rcfc_nolatent, parms = par, 
+#                 method='ode45')
+# 
+# model_out<-as.data.frame(model_out)
+# Infected<-N-sum(model_out$S.c[366], model_out$S.c.pos[366], model_out$S.a[366], model_out$S.a.pos[366], 
+#                 model_out$S.rc[366], model_out$S.rc.pos[366], model_out$S.fc[366], model_out$S.fc.pos[366],
+#                 model_out$S.e[366], model_out$S.e.pos[366])
+# Pinfect<-Infected/N
+# Infected; Pinfect
+# Deaths<-sum(model_out$D.a[366], model_out$D.c[366], model_out$D.e[366], model_out$D.rc[366], 
+#             model_out$D.fc[366])
+# Deaths
+# 
+# null.model<-ddply(model_out, .(time), summarize, 
+#                   CriticalCare=sum(Hc.fc, Hc.rc, Hc.c, Hc.a, Hc.e, Hc.c),
+#                   Deaths=sum(D.c, D.a, D.e, D.rc, D.fc),
+#                   CI=(N-sum(S.c, S.c.pos, S.a, S.a.pos, S.rc, S.rc.pos, S.fc, S.fc.pos, S.e, S.e.pos))/N)
+# plot(null.model$CriticalCare)
+# 
+# null.model$Deaths[60]; null.model$Deaths[90]
+seir_model_shields_rcfc_nolatent(0, start, params)

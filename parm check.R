@@ -125,6 +125,8 @@ seir_model_shields_rcfc_nolatent <- function(t, x, params) {
   tot.fc.gen = tot.fc - tot.fc.pos
   tot.e.gen = tot.e - tot.e.pos
   
+  print(c(tot.c, tot.a, tot.rc, tot.fc, tot.e))
+  
   #Fraction of population in each group who has tested positive by time
   FracReleased<-c(tot.c.pos/tot.c, tot.a.pos/tot.a, tot.rc.pos/tot.rc, 
                   tot.fc.pos/tot.fc, tot.e.pos/tot.e) 
@@ -373,6 +375,8 @@ seir_model_shields_rcfc_nolatent <- function(t, x, params) {
       OtherContacts_10x10_TargetedDistancing2+SchoolContacts_10x10_Baseline
   }
   
+  print(CM)
+  
   #Force of infection by group 
   #Children
   foi.c.pos = q*((CM[1,1]*infec.c.pos/(tot.c.pos)) + (CM[1,2]*infec.c.gen/(tot.c.gen))+
@@ -439,6 +443,8 @@ seir_model_shields_rcfc_nolatent <- function(t, x, params) {
                    (CM[10,7]*infec.fc.pos/(tot.fc.pos)) + (CM[10,8]*infec.fc.gen/(tot.fc.gen))+
                    (CM[10,9]*infec.e.pos/(tot.e.pos)) + (CM[10,10]*infec.e.gen/(tot.e.gen)))
   
+  print(c(foi.c.pos, foi.c.gen, foi.a.pos, foi.a.gen, foi.rc.pos, foi.rc.gen, foi.fc.pos, foi.fc.gen, foi.e.pos, foi.e.gen))
+  
   #Testing
   
   #Get number of tests available by group
@@ -461,22 +467,57 @@ seir_model_shields_rcfc_nolatent <- function(t, x, params) {
   if(test.e>1){test.e<-1}
   
   #Model equations
-  dS.c = - foi.c.gen*S.c - (1-specificity)*test.c*test.switch2*S.c 
-  dE.c = foi.c.gen*S.c - gamma_e*E.c - (1-specificity)*test.c*test.switch2*E.c
-  dIs.c = gamma_e*E.c*p - gamma_s*Is.c 
-  dIa.c = gamma_e*E.c*(1-p) - gamma_a*Ia.c - (1-specificity)*test.c*test.switch2*Ia.c
-  dHs.c = gamma_s*Is.c*(hosp_frac[1]-hosp_crit[1]) + gamma_s*Is.c.pos*(hosp_frac[1]-hosp_crit[1]) - gamma_hs*Hs.c
-  dHc.c = gamma_s*Is.c*hosp_crit[1] + gamma_s*Is.c.pos*hosp_crit[1]- gamma_hc*Hc.c
+  dS.c = - foi.c.gen*S.c - 
+    (1-specificity)*test.c*test.switch2*S.c 
+  
+  dE.c = foi.c.gen*S.c - 
+    gamma_e*E.c - 
+    (1-specificity)*test.c*test.switch2*E.c
+  
+  dIs.c = gamma_e*E.c*p -
+    gamma_s*Is.c 
+  
+  dIa.c = gamma_e*E.c*(1-p) - 
+    gamma_a*Ia.c - 
+    (1-specificity)*test.c*test.switch2*Ia.c
+  
+  dHs.c = gamma_s*Is.c*(hosp_frac[1]-hosp_crit[1]) + 
+    gamma_s*Is.c.pos*(hosp_frac[1]-hosp_crit[1]) - 
+    gamma_hs*Hs.c
+  
+  dHc.c = gamma_s*Is.c*hosp_crit[1] + 
+    gamma_s*Is.c.pos*hosp_crit[1] - 
+    gamma_hc*Hc.c
+  
   dD.c = gamma_hc*Hc.c*crit_die[1]
-  dR.c = (1-hosp_frac[1])*gamma_s*Is.c + gamma_a*Ia.c + (1-sensitivity)*test.switch2*gamma_hs*Hs.c + 
-    (1-sensitivity)*gamma_hc*test.switch2*Hc.c*(1-crit_die[1])  - sensitivity*test.c*test.switch2*R.c+
+  
+  dR.c = (1-hosp_frac[1])*gamma_s*Is.c + 
+    gamma_a*Ia.c + 
+    (1-sensitivity)*test.switch2*gamma_hs*Hs.c + 
+    (1-sensitivity)*gamma_hc*test.switch2*Hc.c*(1-crit_die[1]) - 
+    sensitivity*test.c*test.switch2*R.c +
     gamma_hc*test.switch1*Hc.c*(1-crit_die[1])+test.switch1*gamma_hs*Hs.c 
-  dS.c.pos = (1-specificity)*test.c*test.switch2*S.c - foi.c.pos*S.c.pos 
-  dE.c.pos = (1-specificity)*test.c*test.switch2*E.c + foi.c.pos*S.c.pos - gamma_e*E.c.pos 
-  dIs.c.pos = gamma_e*E.c.pos*p - gamma_s*Is.c.pos
-  dIa.c.pos = (1-specificity)*test.c*test.switch2*Ia.c + gamma_e*E.c.pos*(1-p) - gamma_a*Ia.c.pos
-  dR.c.pos = sensitivity*test.c*test.switch2*R.c + sensitivity*gamma_hc*test.switch2*Hc.c*(1-crit_die[1]) + sensitivity*gamma_hs*test.switch2*Hs.c +
-    (1-hosp_frac[1])*gamma_s*Is.c.pos + gamma_a*Ia.c.pos
+  
+  dS.c.pos = (1-specificity)*test.c*test.switch2*S.c - 
+    foi.c.pos*S.c.pos 
+  
+  dE.c.pos = (1-specificity)*test.c*test.switch2*E.c + 
+    foi.c.pos*S.c.pos - 
+    gamma_e*E.c.pos 
+  
+  dIs.c.pos = gamma_e*E.c.pos*p - 
+    gamma_s*Is.c.pos
+  
+  dIa.c.pos = (1-specificity)*test.c*test.switch2*Ia.c + 
+    gamma_e*E.c.pos*(1-p) - 
+    gamma_a*Ia.c.pos
+  
+  dR.c.pos = sensitivity*test.c*test.switch2*R.c + 
+    sensitivity*gamma_hc*test.switch2*Hc.c*(1-crit_die[1]) + 
+    sensitivity*gamma_hs*test.switch2*Hs.c +
+    (1-hosp_frac[1])*gamma_s*Is.c.pos + 
+    gamma_a*Ia.c.pos
+  
   
   dS.a = - foi.a.gen*S.a - (1-specificity)*test.a*test.switch2*S.a 
   dE.a = foi.a.gen*S.a - gamma_e*E.a - (1-specificity)*test.a*test.switch2*E.a
@@ -548,6 +589,7 @@ seir_model_shields_rcfc_nolatent <- function(t, x, params) {
     (1-hosp_frac[3])*gamma_s*Is.e.pos + gamma_a*Ia.e.pos
   
   
+  print(c(dS.c, dS.a, dS.fc, dS.rc, dS.e))
   
   res = c(dS.c, dE.c, dIs.c, dIa.c, dHs.c, dHc.c, dD.c, dR.c, dS.c.pos, dE.c.pos, dIs.c.pos, dIa.c.pos, dR.c.pos,
           dS.a, dE.a, dIs.a, dIa.a, dHs.a, dHc.a, dD.a, dR.a, dS.a.pos, dE.a.pos, dIs.a.pos, dIa.a.pos, dR.a.pos,
@@ -561,23 +603,17 @@ seir_model_shields_rcfc_nolatent <- function(t, x, params) {
 }
 
 
-#Model parameters
-
-# Population
 N=323*10^6
 agefrac.0=c(0.12,0.13,0.13,0.13,0.13,0.13,0.11,0.06,0.04,0.02) # from Weitz model
 agestruc=c(sum(agefrac.0[1:2]), sum(agefrac.0[3:6], 0.5*agefrac.0[7]), 
            sum(0.5*agefrac.0[7], agefrac.0[8:10]))
 
-#Initial matrices
-#3x3 data from Prem et al
 AllContacts<-matrix(data=c(9.75, 2.57, 0.82, 5.97, 10.32, 2.25, 0.39, 0.46, 1.20), nrow=3)
 WorkContacts<-matrix(data=c(0.20, 0.28, 0, 0.64, 4.73, 0, 0, 0, 0), nrow=3)
 SchoolContacts<-matrix(data=c(4.32, 0.47, 0.02, 1.10, 0.32, 0.04, 0.01, 0.01, 0.03), nrow=3)
 HomeContacts<-matrix(data=c(2.03, 1.02, 0.50, 2.37, 1.82, 0.68, 0.24, 0.14, 0.62), nrow=3)
 OtherContacts<-matrix(data=c(3.20, 0.80, 0.30, 1.86, 3.45, 1.53, 0.14, 0.32, 0.55), nrow=3)
-#Expand the 3x3 matrix to a 5x5 based on the fraction of the population in each of the worker
-#subgroups
+
 expand_5x5<-function(oldmatrix, phome, preduced, pfull){
   newmatrix<-matrix(NA, ncol=5, nrow=5)
   newmatrix[1,1]<-oldmatrix[1,1]
@@ -598,10 +634,8 @@ expand_5x5<-function(oldmatrix, phome, preduced, pfull){
 }
 
 prob.home<-0.316
-#prob.home<-0.4
 prob.full<-0.0565
 prob.reduced<-1-prob.full-prob.home
-#prob.reduced<-0.678
 preduced<-0.5
 pfull<-1
 sd.other<-0.25
@@ -616,43 +650,19 @@ SchoolContacts_5x5<-expand_5x5(oldmatrix=SchoolContacts,
 OtherContacts_5x5<-expand_5x5(oldmatrix=OtherContacts, 
                               phome=prob.home, preduced=prob.reduced, pfull=prob.full)
 
-#Note on R0: with base structure 47.28q=R0
-#Old latent period: 44.895q
-#New latent period: 63.28q
 R0=3.2
 q=R0/65.95  #probability of transmission from children
 asymp.red=0.55 #relative infectiousness of asymptomatic infections compared to 
-#symptomatic infections
-
-
-# Natural History Parameters
 gamma_e=1/3     # Latent period (He et al)
 gamma_a=1/7     # Recovery rate, undocumented (Kissler et al)
 gamma_s=1/7    # Recovery rate, undocumented (Kissler et al)
 gamma_hs=1/5    # Recovery rate, hospitalized cases (Zhou et al--China study)
 gamma_hc=1/7
-
-#pars$p=c(0.99, 0.99, 0.95, 0.9, 0.8, 0.7, 0.6, 0.5, 0.5, 0.5) # Structured, from Weitz model
-
-#beta_a=2.5/10   # Transmission for asymptomatic # from Weitz model
-#beta_s=5/10     # Transmission for symptomatic # from Weitz model
-
-#Ferguson parameters
 hosp_frac<-c(0.002, 0.056, 0.224) #Ferguson
 hosp_crit<-c(0.001, 0.0048, 0.099) #Ferguson
 p=0.50
 R0=3.1
 q=R0/79.27
-#hosp_crit<-c(0.05, 0.085, 0) #Artificial, to check
-
-#MMWR Parameters
-
-#hosp_frac=c(0.061, 0.182, 0.417) #From MMWR
-#hosp_crit=c(0, 0.063, 0.173) #From CDC, MMWR
-#p=0.20 #Based on Li et al
-#R0=2.9
-#q=R0/65.948
-
 crit_die=c(0, 0.5, 0.5) #Averaged from Ferguson
 
 
@@ -688,6 +698,7 @@ start = c(S.c = agestruc[1]*N - initcase.c, E.c = 0, Is.c = initcase.c, Ia.c = 0
 
 t = (0:365)
 #t = (0:364)
+
 
 #Scenarios
 #Do nothing
@@ -730,216 +741,47 @@ params = c('agestruc'=agestruc,
            'p'=p, 'hosp_frac'=hosp_frac, 'hosp_crit'=hosp_crit, 'crit_die'=crit_die,
            'sensitivity'=sensitivity, 'specificity'=specificity) 
 
-model_out = ode(y = start, times = t, fun = seir_model_shields_rcfc_nolatent, parms = par, 
-                method='ode45')
+# model_out = ode(y = start, times = t, fun = seir_model_shields_rcfc_nolatent, parms = par, 
+#                 method='ode45')
+# 
+# model_out<-as.data.frame(model_out)
+# 
+# test=model_out[,order(colnames(model_out))]
+# save(test, file='temp.R')
 
-model_out<-as.data.frame(model_out)
-Infected<-N-sum(model_out$S.c[366], model_out$S.c.pos[366], model_out$S.a[366], model_out$S.a.pos[366], 
-                model_out$S.rc[366], model_out$S.rc.pos[366], model_out$S.fc[366], model_out$S.fc.pos[366],
-                model_out$S.e[366], model_out$S.e.pos[366])
-Pinfect<-Infected/N
-Infected; Pinfect
 
-Deaths<-sum(model_out$D.a[366], model_out$D.c[366], model_out$D.e[366], model_out$D.rc[366], 
-            model_out$D.fc[366])
-Deaths
+start = rep(1,65)
+test2 = seir_model_shields_rcfc_nolatent(0, start, params)[[1]]
 
-null.model<-ddply(model_out, .(time), summarize, 
-                  CriticalCare=sum(Hc.fc, Hc.rc, Hc.c, Hc.a, Hc.e, Hc.c),
-                  Deaths=sum(D.c, D.a, D.e, D.rc, D.fc),
-                  CI=(N-sum(S.c, S.c.pos, S.a, S.a.pos, S.rc, S.rc.pos, S.fc, S.fc.pos, S.e, S.e.pos))/N)
-plot(null.model$CriticalCare)
 
-null.model$Deaths[60]; null.model$Deaths[90]
-#625 deaths day 60
-#38,141 deaths day 90
-null.model[366,3] #Deaths
-null.model[366,3]/(null.model[366,4]*N) #IFR
-null.model[366,3]/(null.model[366,4]*N*p) #CFR
 
-#Total deaths: 940,090, CI=86.4%
 
-#Indefinite social distancing only
-start.time.distance<-70
-sd.other<-0.25
-preduced<-0.1
-start.time.target<-500
-start.time.test<-500
-daily.tests<-0
-time.reopen<-500
 
-tswitch1.dat<-data.frame(times=times, test.switch1=c(rep(1, 366)))
-tswitch2.dat<-data.frame(times=times, test.switch2=c(rep(0, 366)))
-#tswitch1.dat<-data.frame(times=times, test.switch1=c(rep(1, start.time.test+1),
-#                                                     rep(0, length(times)-(start.time.test+1))))
-#tswitch2.dat<-data.frame(times=times, test.switch2=c(rep(0, start.time.test+1),
-#                                                     rep(1, length(times)-(start.time.test+1))))
 
-sw1fxn<-approxfun(tswitch1.dat$times, tswitch1.dat$test.switch1, rule=2)
-sw2fxn<-approxfun(tswitch2.dat$times, tswitch2.dat$test.switch2, rule=2)
 
-params = c('agestruc'=agestruc, 
-           'HomeContacts_5x5'=HomeContacts_5x5, 'WorkContacts_5x5'=WorkContacts_5x5, 'SchoolContacts_5x5'=SchoolContacts_5x5, 
-           'OtherContacts_5x5'=OtherContacts_5x5, 
-           'preduced'=preduced, 'pfull'=pfull, 'sd.other'=sd.other,
-           'preduced2'=preduced, 'sd.other2'=sd.other,
-           'alpha'=alpha, 'daily.tests'=daily.tests,
-           'start.time.distance'=start.time.distance, 
-           'time.reopen'=time.reopen,
-           #'start.time.target'=start.time.target, 
-           #'school.start.time'=school.start.time,
-           'gamma_e'=gamma_e, 'gamma_a'=gamma_a, 'gamma_s'=gamma_s, 'gamma_hs'=gamma_hs, 'gamma_hc'=gamma_hc, 
-           'p'=p, 'hosp_frac'=hosp_frac, 'hosp_crit'=hosp_crit, 'crit_die'=crit_die,
-           'sensitivity'=sensitivity, 'specificity'=specificity) 
 
-model_out = ode(y = start, times = t, fun = seir_model_shields_rcfc_nolatent, parms = par, 
-                method='ode45')
 
-model_out<-as.data.frame(model_out)
-Infected<-N-sum(model_out$S.c[366], model_out$S.c.pos[366], model_out$S.a[366], model_out$S.a.pos[366], 
-                model_out$S.rc[366], model_out$S.rc.pos[366], model_out$S.fc[366], model_out$S.fc.pos[366],
-                model_out$S.e[366], model_out$S.e.pos[366])
-Pinfect<-Infected/N
-Infected; Pinfect
-Deaths<-sum(model_out$D.a[366], model_out$D.c[366], model_out$D.e[366], model_out$D.rc[366], 
-            model_out$D.fc[366])
-Deaths
-
-indef.dist<-ddply(model_out, .(time), summarize, 
-                  CriticalCare=sum(Hc.fc, Hc.rc, Hc.c, Hc.a, Hc.e, Hc.c),
-                  Deaths=sum(D.c, D.a, D.e, D.rc, D.fc),
-                  CI=(N-sum(S.c, S.c.pos, S.a, S.a.pos, S.rc, S.rc.pos, S.fc, S.fc.pos, S.e, S.e.pos))/N)
-plot(indef.dist$CriticalCare)
-
-indef.dist$Deaths[60]; indef.dist$Deaths[90]
-#Indefinite distancing: 208,354; CI=0.239
-
-#Social distancing ending on 5/01/2020
-start.time.distance<-70
-time.reopen<-107
-
-params = c('agestruc'=agestruc, 
-           'HomeContacts_5x5'=HomeContacts_5x5, 'WorkContacts_5x5'=WorkContacts_5x5, 'SchoolContacts_5x5'=SchoolContacts_5x5, 
-           'OtherContacts_5x5'=OtherContacts_5x5, 
-           'preduced'=preduced, 'pfull'=pfull, 'sd.other'=sd.other,
-           'preduced2'=preduced, 'sd.other2'=sd.other,
-           'alpha'=alpha, 'daily.tests'=daily.tests,
-           'start.time.distance'=start.time.distance, 
-           'time.reopen'=time.reopen,
-           #'start.time.target'=start.time.target, 
-           #'school.start.time'=school.start.time,
-           'gamma_e'=gamma_e, 'gamma_a'=gamma_a, 'gamma_s'=gamma_s, 'gamma_hs'=gamma_hs, 'gamma_hc'=gamma_hc, 
-           'p'=p, 'hosp_frac'=hosp_frac, 'hosp_crit'=hosp_crit, 'crit_die'=crit_die,
-           'sensitivity'=sensitivity, 'specificity'=specificity)
-
-model_out = ode(y = start, times = t, fun = seir_model_shields_rcfc_nolatent, parms = par, 
-                method='ode45')
-
-model_out<-as.data.frame(model_out)
-Infected<-N-sum(model_out$S.c[366], model_out$S.c.pos[366], model_out$S.a[366], model_out$S.a.pos[366], 
-                model_out$S.rc[366], model_out$S.rc.pos[366], model_out$S.fc[366], model_out$S.fc.pos[366],
-                model_out$S.e[366], model_out$S.e.pos[366])
-Pinfect<-Infected/N
-Infected; Pinfect
-Deaths<-sum(model_out$D.a[366], model_out$D.c[366], model_out$D.e[366], model_out$D.rc[366], 
-            model_out$D.fc[366])
-Deaths
-
-early.dist<-ddply(model_out, .(time), summarize, 
-                  CriticalCare=sum(Hc.fc, Hc.rc, Hc.c, Hc.a, Hc.e, Hc.c),
-                  Deaths=sum(D.c, D.a, D.e, D.rc, D.fc),
-                  CI=(N-sum(S.c, S.c.pos, S.a, S.a.pos, S.rc, S.rc.pos, S.fc, S.fc.pos, S.e, S.e.pos))/N)
-plot(early.dist$CriticalCare)
-
-#Mid dist
-start.time.distance<-70
-time.reopen<-168
-
-params = c('agestruc'=agestruc, 
-           'HomeContacts_5x5'=HomeContacts_5x5, 'WorkContacts_5x5'=WorkContacts_5x5, 'SchoolContacts_5x5'=SchoolContacts_5x5, 
-           'OtherContacts_5x5'=OtherContacts_5x5, 
-           'preduced'=preduced, 'pfull'=pfull, 'sd.other'=sd.other,
-           'preduced2'=preduced, 'sd.other2'=sd.other,
-           'alpha'=alpha, 'daily.tests'=daily.tests,
-           'start.time.distance'=start.time.distance, 
-           'time.reopen'=time.reopen,
-           #'start.time.target'=start.time.target, 
-           #'school.start.time'=school.start.time,
-           'gamma_e'=gamma_e, 'gamma_a'=gamma_a, 'gamma_s'=gamma_s,'gamma_hs'=gamma_hs, 'gamma_hc'=gamma_hc, 
-           'p'=p, 'hosp_frac'=hosp_frac, 'hosp_crit'=hosp_crit, 'crit_die'=crit_die,
-           'sensitivity'=sensitivity, 'specificity'=specificity)
-
-model_out = ode(y = start, times = t, fun = seir_model_shields_rcfc_nolatent, parms = par, 
-                method='ode45')
-
-model_out<-as.data.frame(model_out)
-Infected<-N-sum(model_out$S.c[366], model_out$S.c.pos[366], model_out$S.a[366], model_out$S.a.pos[366], 
-                model_out$S.rc[366], model_out$S.rc.pos[366], model_out$S.fc[366], model_out$S.fc.pos[366],
-                model_out$S.e[366], model_out$S.e.pos[366])
-Pinfect<-Infected/N
-Infected; Pinfect
-Deaths<-sum(model_out$D.a[366], model_out$D.c[366], model_out$D.e[366], model_out$D.rc[366], 
-            model_out$D.fc[366])
-Deaths
-
-mid.dist<-ddply(model_out, .(time), summarize, 
-                CriticalCare=sum(Hc.fc, Hc.rc, Hc.c, Hc.a, Hc.e, Hc.c),
-                Deaths=sum(D.c, D.a, D.e, D.rc, D.fc),
-                CI=(N-sum(S.c, S.c.pos, S.a, S.a.pos, S.rc, S.rc.pos, S.fc, S.fc.pos, S.e, S.e.pos))/N)
-plot(mid.dist$CriticalCare)
-#Total deaths: 851,598; CI=81.9%
-
-#Long dist
-start.time.distance<-70
-time.reopen<-230
-
-params = c('agestruc'=agestruc, 
-           'HomeContacts_5x5'=HomeContacts_5x5, 'WorkContacts_5x5'=WorkContacts_5x5, 'SchoolContacts_5x5'=SchoolContacts_5x5, 
-           'OtherContacts_5x5'=OtherContacts_5x5, 
-           'preduced'=preduced, 'pfull'=pfull, 'sd.other'=sd.other,
-           'preduced2'=preduced, 'sd.other2'=sd.other,
-           'alpha'=alpha, 'daily.tests'=daily.tests,
-           'start.time.distance'=start.time.distance, 
-           'time.reopen'=time.reopen,
-           #'start.time.target'=start.time.target, 
-           #'school.start.time'=school.start.time,
-           'gamma_e'=gamma_e, 'gamma_a'=gamma_a, 'gamma_s'=gamma_s, 'gamma_hs'=gamma_hs, 'gamma_hc'=gamma_hc, 
-           'p'=p, 'hosp_frac'=hosp_frac, 'hosp_crit'=hosp_crit, 'crit_die'=crit_die,
-           'sensitivity'=sensitivity, 'specificity'=specificity)
-
-model_out = ode(y = start, times = t, fun = seir_model_shields_rcfc_nolatent, parms = par, 
-                method='ode45')
-
-model_out<-as.data.frame(model_out)
-Infected<-N-sum(model_out$S.c[366], model_out$S.c.pos[366], model_out$S.a[366], model_out$S.a.pos[366], 
-                model_out$S.rc[366], model_out$S.rc.pos[366], model_out$S.fc[366], model_out$S.fc.pos[366],
-                model_out$S.e[366], model_out$S.e.pos[366])
-Pinfect<-Infected/N
-Infected; Pinfect
-Deaths<-sum(model_out$D.a[366], model_out$D.c[366], model_out$D.e[366], model_out$D.rc[366], 
-            model_out$D.fc[366])
-Deaths
-
-long.dist<-ddply(model_out, .(time), summarize, 
-                 CriticalCare=sum(Hc.fc, Hc.rc, Hc.c, Hc.a, Hc.e, Hc.c),
-                 Deaths=sum(D.c, D.a, D.e, D.rc, D.fc),
-                 CI=(N-sum(S.c, S.c.pos, S.a, S.a.pos, S.rc, S.rc.pos, S.fc, S.fc.pos, S.e, S.e.pos))/N)
-plot(long.dist$CriticalCare)
-#Total deaths: 824,805 and CI=80.7%
-
-null.model$Intervention<-'Do nothing'
-indef.dist$Intervention<-'Indefinite social distancing'
-early.dist$Intervention<-'Stop distancing 5/01/2020'
-mid.dist$Intervention<-'Stop distancing 7/01/2020'
-long.dist$Intervention<-'Stop distancing 9/01/2020'
-
-ModelsCompare<-rbind(null.model, indef.dist, early.dist, mid.dist, long.dist)
-SD_Naive<-ggplot(data=ModelsCompare, aes(x=time, y=CriticalCare, group=Intervention))+
-  geom_line(aes(color=Intervention))+theme_classic()+labs(y='Critical Care Beds')
-
-ggsave(SD_Naive, file='/Users/aliciakraay/Dropbox/NaiveSD_Relax.pdf', width = 8, height = 4, units = "in",  dpi = 300)
-null.model[366,]; null.model[366,4]*N
-indef.dist[366,]; indef.dist[366,4]*N
-early.dist[366,]; early.dist[366,4]*N
-mid.dist[366,]; mid.dist[366,4]*N
-long.dist[366,]; long.dist[366,4]*N
+# 
+# Infected<-N-sum(model_out$S.c[366], model_out$S.c.pos[366], model_out$S.a[366], model_out$S.a.pos[366], 
+#                 model_out$S.rc[366], model_out$S.rc.pos[366], model_out$S.fc[366], model_out$S.fc.pos[366],
+#                 model_out$S.e[366], model_out$S.e.pos[366])
+# Pinfect<-Infected/N
+# Infected; Pinfect
+# Deaths<-sum(model_out$D.a[366], model_out$D.c[366], model_out$D.e[366], model_out$D.rc[366], 
+#             model_out$D.fc[366])
+# Deaths
+# 
+# null.model<-ddply(model_out, .(time), summarize, 
+#                   CriticalCare=sum(Hc.fc, Hc.rc, Hc.c, Hc.a, Hc.e, Hc.c),
+#                   Deaths=sum(D.c, D.a, D.e, D.rc, D.fc),
+#                   CI=(N-sum(S.c, S.c.pos, S.a, S.a.pos, S.rc, S.rc.pos, S.fc, S.fc.pos, S.e, S.e.pos))/N)
+# plot(null.model$CriticalCare)
+# 
+# null.model$Deaths[60]; null.model$Deaths[90]
+# #625 deaths day 60
+# #38,141 deaths day 90
+# null.model[366,3] #Deaths
+# null.model[366,3]/(null.model[366,4]*N) #IFR
+# null.model[366,3]/(null.model[366,4]*N*p) #CFR
+# 
+# #Total deaths: 940,090, CI=86.4%

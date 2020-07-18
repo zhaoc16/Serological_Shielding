@@ -10,7 +10,6 @@ require(beepr)
 
 source('reorg/utils.R')
 
-
 # (1) Model Parameters ----------------------------------------------------
 model_pars=list()
 
@@ -117,8 +116,8 @@ contact_pars[['OtherContacts_5x5']]=Expand_5x5(contactMatrix=contact_pars$OtherC
 intervention_pars=list()
 
 # Test Data for Cellex (from April 2020)
-intervention_pars[['sensitivity']]=1
-intervention_pars[['specificity']]=0.96
+intervention_pars[['sensitivity']]=1.00
+intervention_pars[['specificity']]=0.998
 intervention_pars[['daily_tests']]=10**3
 
 # Other intervention parameters
@@ -126,12 +125,13 @@ intervention_pars[['tStart_distancing']]=70
 intervention_pars[['tStart_test']]=107    # can change when in the outbreak testing becomes available
 intervention_pars[['tStart_target']]=115
 intervention_pars[['tStart_school']]=230
+intervention_pars[['tStart_reopen']]=500
 
 intervention_pars[['socialDistancing_other']]=0.25
 intervention_pars[['p_reduced']]=0.5      # proportion of contacts reduced 
 intervention_pars[['p_full']]=1           # proportion of contacts reduced for full contact adults
 
-intervention_pars[['alpha']]=4            # shielding. Note this is not alpha_JSW, but (alpha_JSW+1)
+intervention_pars[['alpha']]=1.2          # shielding. Note this is not alpha_JSW, but (alpha_JSW+1)
 intervention_pars[['c']]=1
 
 intervention_pars[['socialDistancing_other_c']]=0.25
@@ -150,10 +150,10 @@ epi_pars[['gamma_a']]=1/7           # Recovery rate, undocumented (Kissler et al
 epi_pars[['gamma_s']]=1/7           # Recovery rate, undocumented (Kissler et al)
 epi_pars[['gamma_hs']]=1/5          # LOS for subcritical cases (medrxiv paper)
 epi_pars[['gamma_hc']]=1/7          # LOS for critical cases (medrxiv paper)
-epi_pars[['p']]=0.3#0.14            # Fraction 'Symptomatic'documented' (Shaman's paper)
+epi_pars[['p']]=0.5#0.14            # Fraction 'Symptomatic'documented' (Shaman's paper)
 
 epi_pars[['hosp_frac']]=c(0.002, 0.056, 0.224)  # From MMWR
-epi_pars[['hosp_crit']]=c(0.001, 0.0048, 0.099)       # From CDC, MMWR
+epi_pars[['hosp_crit']]=c(0.001, 0.0048, 0.099) # From CDC, MMWR
 epi_pars[['crit_die']]=c(0, 0.5, 0.5)           # Obtained from initial fitting
 
 epi_pars[['hosp_frac_5']]=epi_pars$hosp_frac[c(1,2,2,2,3)]
@@ -174,24 +174,6 @@ inits[['I_rc0']]=50
 inits[['I_fc0']]=1
 inits[['I_e0']]=40
 
-X0=rep(0,model_pars$nTotSubComp)
-
-# Remove from susceptible pool ...
-X0[1]=model_pars$agestruc[1]*model_pars$N-inits$I_c0 
-X0[2]=model_pars$agestruc[2]*contact_pars$frac_home*model_pars$N-inits$I_a0 
-X0[3]=model_pars$agestruc[2]*contact_pars$frac_reduced*model_pars$N-inits$I_rc0 
-X0[4]=model_pars$agestruc[2]*contact_pars$frac_full*model_pars$N-inits$I_fc0 
-X0[5]=model_pars$agestruc[3]*model_pars$N-inits$I_e0 
-
-# ... and add to infected
-X0[11]=inits$I_c0
-X0[12]=inits$I_a0
-X0[13]=inits$I_rc0
-X0[14]=inits$I_fc0
-X0[15]=inits$I_e0
-
-names(X0) = model_pars$varNames
-
 
 # (6) Remainder -----------------------------------------------------------
 
@@ -203,21 +185,39 @@ sw1fxn=approxfun(tswitch1.dat$times, tswitch1.dat$test.switch1, rule=2)
 sw2fxn=approxfun(tswitch2.dat$times, tswitch2.dat$test.switch2, rule=2)
 
 # Combine
-pars = list('model_pars' = model_pars
-            , 'contact_pars' = contact_pars
-            , 'intervention_pars'= intervention_pars
-            , 'epi_pars' = epi_pars)
+# pars_default = list('model_pars' = model_pars
+#                     , 'contact_pars' = contact_pars
+#                     , 'intervention_pars'= intervention_pars
+#                     , 'epi_pars' = epi_pars)
 
-pars = c(model_pars, contact_pars, intervention_pars, epi_pars)
-
-
+pars_default = c(model_pars, contact_pars, intervention_pars, epi_pars, inits)
 
 
 # (7) Test Cases ----------------------------------------------------------
 
-# Test
-set.seed(1234)
-Xtest = round(runif(length(X0))*pars$N)
-names(Xtest) = names(X0)
+X0=rep(0,pars_default$nTotSubComp)
 
-seir_model_shields_rcfc_nolatent(0, X0, pars)
+# Remove from susceptible pool ...
+X0[1]=pars_default$agestruc[1]*pars_default$N-inits$I_c0 
+X0[2]=pars_default$agestruc[2]*pars_default$frac_home*pars_default$N-inits$I_a0 
+X0[3]=pars_default$agestruc[2]*pars_default$frac_reduced*pars_default$N-inits$I_rc0 
+X0[4]=pars_default$agestruc[2]*pars_default$frac_full*pars_default$N-inits$I_fc0 
+X0[5]=pars_default$agestruc[3]*pars_default$N-inits$I_e0 
+
+# ... and add to infected
+X0[11]=inits$I_c0
+X0[12]=inits$I_a0
+X0[13]=inits$I_rc0
+X0[14]=inits$I_fc0
+X0[15]=inits$I_e0
+
+names(X0) = pars_default$varNames
+
+
+# 
+# # Test
+# set.seed(1234)
+# Xtest = round(runif(length(X0))*pars_default$N)
+# names(Xtest) = names(X0)
+# 
+# seir_model_shields_rcfc_nolatent(0, X0, pars_default)

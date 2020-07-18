@@ -707,7 +707,7 @@ specificity<-c(0.50, 0.96, 0.998)
 testing<-c(0, 10^3, 10^4, 10^5, 5*10^5, 10^6, 2*10^6, 4*10^6, 6*10^6, 8*10^6, 10^7)
 
 sweep<-expand.grid(cval=cval2, testval=testing, alpha=alpha2,
-                    specificity=specificity)
+                   specificity=specificity)
 
 data.summary<-list(dim(sweep)[1])
 data.full<-list(dim(sweep)[1])
@@ -758,22 +758,22 @@ for(i in 1:dim(sweep)[1]){
                                 method='ode45'))
   
   data.summary[[i]]<-ddply(model_out, .(time), summarize, 
-                            CriticalCare=sum(Hc.fc, Hc.rc, Hc.c, Hc.a, Hc.e),
-                            Hospital=sum(Hc.fc, Hc.rc, Hc.c, Hc.a, Hc.e, 
-                                         Hs.fc, Hs.rc, Hs.c, Hs.a, Hs.e),
-                            Deaths=sum(D.c, D.a, D.e, D.rc, D.fc),
-                            Released=sum(S.c.pos, E.c.pos, Ia.c.pos, Is.c.pos, R.c.pos,
-                                         S.a.pos, E.a.pos, Ia.a.pos, Is.a.pos, R.a.pos,
-                                         S.rc.pos, E.rc.pos, Ia.rc.pos, Is.rc.pos, R.rc.pos,
-                                         S.fc.pos, E.fc.pos, Ia.fc.pos, Is.fc.pos, R.fc.pos,
-                                         S.e.pos, E.e.pos, Ia.e.pos, Is.e.pos, R.e.pos),
-                            PR.released=sum(R.c.pos, R.a.pos, R.rc.pos, R.fc.pos, R.e.pos)/Released,
-                            Retained=N-Released,
-                            Pos.retained=sum(R.c, R.a, R.rc, R.fc, R.e),
-                            PR.retained=Pos.retained/Retained,
-                            Incidence=N-sum(S.c, S.c.pos, S.a, S.a.pos, S.rc, S.rc.pos, S.fc, S.fc.pos,
-                                            S.e, S.e.pos),
-                            CI=Incidence/N)
+                           CriticalCare=sum(Hc.fc, Hc.rc, Hc.c, Hc.a, Hc.e),
+                           Hospital=sum(Hc.fc, Hc.rc, Hc.c, Hc.a, Hc.e, 
+                                        Hs.fc, Hs.rc, Hs.c, Hs.a, Hs.e),
+                           Deaths=sum(D.c, D.a, D.e, D.rc, D.fc),
+                           Released=sum(S.c.pos, E.c.pos, Ia.c.pos, Is.c.pos, R.c.pos,
+                                        S.a.pos, E.a.pos, Ia.a.pos, Is.a.pos, R.a.pos,
+                                        S.rc.pos, E.rc.pos, Ia.rc.pos, Is.rc.pos, R.rc.pos,
+                                        S.fc.pos, E.fc.pos, Ia.fc.pos, Is.fc.pos, R.fc.pos,
+                                        S.e.pos, E.e.pos, Ia.e.pos, Is.e.pos, R.e.pos),
+                           PR.released=sum(R.c.pos, R.a.pos, R.rc.pos, R.fc.pos, R.e.pos)/Released,
+                           Retained=N-Released,
+                           Pos.retained=sum(R.c, R.a, R.rc, R.fc, R.e),
+                           PR.retained=Pos.retained/Retained,
+                           Incidence=N-sum(S.c, S.c.pos, S.a, S.a.pos, S.rc, S.rc.pos, S.fc, S.fc.pos,
+                                           S.e, S.e.pos),
+                           CI=Incidence/N)
   data.full[[i]]<-model_out
 }
 
@@ -820,9 +820,9 @@ ggplot(data=subset(End, End$alpha==alphaplot),
   #aes(x=testval, y=Deaths, group = factor(cval), color = factor(cval))) +
   geom_line(aes(linetype=factor(specificity)))+
   scale_linetype_manual(values=c("dotted", "solid", "longdash")) +
-                        #labels=c("Antibodies confer weak immunity",
-                        #         "High-performance assay (Sp = 99.8%)",
-                        #         "Sub-optimally specific assay (Sp = 96%)")) +
+  #labels=c("Antibodies confer weak immunity",
+  #         "High-performance assay (Sp = 99.8%)",
+  #         "Sub-optimally specific assay (Sp = 96%)")) +
   #geom_line(data=subset(SD_test_sweep2, SD_test_sweep2$specificity==1.00 & SD_test_sweep2$alpha==alphaplot), aes(x=testval, y=Deaths, group=factor(cval),
   #color=factor(cval)), linetype=specificity)+  
   scale_color_viridis_d(begin = 0, end = 0.9) +
@@ -884,22 +884,22 @@ ggplot(data=subset(End, End$alpha==alphaplot),
   annotate("text", x=20000, y=180000, label=paste("Indefinite social distancing"), color="grey40", size=4) +  theme(#legend.position=c(0.5, 0.5),
     legend.position='none',    
     legend.key = element_blank(),
-        legend.key.size = unit(0.5, "cm"),
-        legend.text=element_text(size=6),
-        legend.title=element_text(size=6),
-        legend.key.height = unit(0.5, "cm"),
-        panel.background = element_rect(fill = "white", size = 0.5, linetype = "solid"),
-        plot.title = element_text(hjust = 0),
-        #axis.text=element_text(size=6),
-        #axis.title=element_text(size=6),
-        axis.title.x = element_text(colour = "black", margin = margin(t = 10, r = 10, b = 0, l = 0), size=12),
-        axis.title.y = element_text(colour = "black", margin = margin(t = 10, r = 10, b = 0, l = 0), size=12),
-        axis.text.x = element_text(colour = "black", size = 10),
-        axis.text.y = element_text(colour = "black", size = 10),
-        axis.line.x = element_line(colour = 'black', size=0.25, linetype='solid'),
-        axis.line.y = element_line(colour = 'black', size=0.25, linetype='solid'),
-        axis.ticks.length=unit(.25, "cm"),
-        legend.box='horizontal') -> fig1a5
+    legend.key.size = unit(0.5, "cm"),
+    legend.text=element_text(size=6),
+    legend.title=element_text(size=6),
+    legend.key.height = unit(0.5, "cm"),
+    panel.background = element_rect(fill = "white", size = 0.5, linetype = "solid"),
+    plot.title = element_text(hjust = 0),
+    #axis.text=element_text(size=6),
+    #axis.title=element_text(size=6),
+    axis.title.x = element_text(colour = "black", margin = margin(t = 10, r = 10, b = 0, l = 0), size=12),
+    axis.title.y = element_text(colour = "black", margin = margin(t = 10, r = 10, b = 0, l = 0), size=12),
+    axis.text.x = element_text(colour = "black", size = 10),
+    axis.text.y = element_text(colour = "black", size = 10),
+    axis.line.x = element_line(colour = 'black', size=0.25, linetype='solid'),
+    axis.line.y = element_line(colour = 'black', size=0.25, linetype='solid'),
+    axis.ticks.length=unit(.25, "cm"),
+    legend.box='horizontal') -> fig1a5
 
 alphaplot <- 10
 ggplot(data=subset(End, End$alpha==alphaplot), 
@@ -967,18 +967,18 @@ model_time_plot %>%
   xlab("Days since Jan 15, 2020") +
   ylab("Proportion completely released \n from social distancing") +
   scale_color_viridis_d(option="plasma", begin = 0.1, end = 0.9, direction = -1,
-                      name="Per capita testing rate",
-                      labels=c("No testing", "1% per year", "10% per year",  "Yearly", "Quarterly", "Monthly")) +
+                        name="Per capita testing rate",
+                        labels=c("No testing", "1% per year", "10% per year",  "Yearly", "Quarterly", "Monthly")) +
   #labs(color = "Per capita testing rate") +
   coord_cartesian(xlim=c(0, 365), ylim=c(0, 1)) +
   geom_vline(xintercept = dates[c(1,3,4)], color = "grey60") +
   annotate("text", x = dates[1], y=0.75, label=paste("\nGeneral distancing"), angle=90, color="grey40", size=4) +
   annotate("text", x = dates[3], y=0.65, label=paste("\nTesting"), angle=90, color="grey40", size=4) +
   annotate("text", x = dates[4], y=0.75, label=paste("\nOpen schools"), angle=90, color="grey40", size=4) +
-   #ggtitle("B") +
+  #ggtitle("B") +
   theme(legend.position='none',
-    #legend.position=c(0.5, 0.5),    
-    legend.key = element_blank(),
+        #legend.position=c(0.5, 0.5),    
+        legend.key = element_blank(),
         legend.key.size = unit(0.5, "cm"),
         legend.title = element_text(size=6),
         legend.key.height = unit(0.5, "cm"),
@@ -1015,21 +1015,21 @@ model_time_plot %>%
   theme(#legend.position=c(0.85, 0.9),
     legend.position='none',    
     legend.key = element_blank(),
-        legend.key.size = unit(0.5, "cm"),
-        legend.title = element_text(size=6),
-        legend.key.height = unit(0.5, "cm"),
-        legend.text = element_text(size=6),
-        panel.background = element_rect(fill = "white", size = 0.5, linetype = "solid"),
-        plot.title = element_text(hjust = 0),
-        #axis.text=element_text(size=7),
-        #axis.title=element_text(size=7),
-        axis.title.x = element_text(colour = "black", margin = margin(t = 10, r = 10, b = 0, l = 0), size=12),
-        axis.title.y = element_text(colour = "black", margin = margin(t = 10, r = 10, b = 0, l = 0), size=12),
-        axis.text.x = element_text(colour = "black", size = 10),
-        axis.text.y = element_text(colour = "black", size = 10),
-        axis.line.x = element_line(colour = 'black', size=0.25, linetype='solid'),
-        axis.line.y = element_line(colour = 'black', size=0.25, linetype='solid'),
-        axis.ticks.length=unit(.25, "cm")) -> fig2a5; fig2a5
+    legend.key.size = unit(0.5, "cm"),
+    legend.title = element_text(size=6),
+    legend.key.height = unit(0.5, "cm"),
+    legend.text = element_text(size=6),
+    panel.background = element_rect(fill = "white", size = 0.5, linetype = "solid"),
+    plot.title = element_text(hjust = 0),
+    #axis.text=element_text(size=7),
+    #axis.title=element_text(size=7),
+    axis.title.x = element_text(colour = "black", margin = margin(t = 10, r = 10, b = 0, l = 0), size=12),
+    axis.title.y = element_text(colour = "black", margin = margin(t = 10, r = 10, b = 0, l = 0), size=12),
+    axis.text.x = element_text(colour = "black", size = 10),
+    axis.text.y = element_text(colour = "black", size = 10),
+    axis.line.x = element_line(colour = 'black', size=0.25, linetype='solid'),
+    axis.line.y = element_line(colour = 'black', size=0.25, linetype='solid'),
+    axis.ticks.length=unit(.25, "cm")) -> fig2a5; fig2a5
 alphaplot<-10
 subset(model_time , model_time$alpha == alphaplot &
          model_time$specificity == 0.998 &
@@ -1092,15 +1092,15 @@ early.dist$Strategy<-'Full return to normal May 9, 2020'
 early.dist$testval<-'N/A'
 early.dist$sweepnum<-1000
 c0p<-rbind(mp.c0[,c(1, 3, 6, 7, 17)], early.dist[,c(1, 2, 5, 6,7)])
-  ggplot(data=c0p, aes(x=time, y=CriticalCare, group=sweepnum, color=factor(Strategy)))+
+ggplot(data=c0p, aes(x=time, y=CriticalCare, group=sweepnum, color=factor(Strategy)))+
   geom_line() +
   xlab("Days since Jan 15, 2020") +
   ylab("Critical care patients") +
   scale_color_viridis_d(option="plasma", begin = 0.1, end = 0.9, direction = -1,
-                      name="Strategy",
-                      labels=c("Fully return to normal May 9", "Partially relax May 9, no testing", 
-                               "Partially relax May 9, test 11% per year", 
-                               "Partially relax May 9, annual testing", "Partially relax May 9, monthly testing")) +
+                        name="Strategy",
+                        labels=c("Fully return to normal May 9", "Partially relax May 9, no testing", 
+                                 "Partially relax May 9, test 11% per year", 
+                                 "Partially relax May 9, annual testing", "Partially relax May 9, monthly testing")) +
   scale_y_continuous(labels=comma) +
   coord_cartesian(xlim=c(0, 365), ylim=c(0, 4e5)) +
   geom_vline(xintercept = dates[c(1,3,4)], color = "grey60") +
@@ -1122,39 +1122,39 @@ c0p<-rbind(mp.c0[,c(1, 3, 6, 7, 17)], early.dist[,c(1, 2, 5, 6,7)])
         axis.line.x = element_line(colour = 'black', size=0.25, linetype='solid'),
         axis.line.y = element_line(colour = 'black', size=0.25, linetype='solid'),
         axis.ticks.length=unit(.25, "cm")) -> fig3b.1
-  
+
 mp.c25<-subset(model_time_plot, model_time_plot$cval == 0.25 & !(model_time_plot$testval==4*10^6))
 mp.c25$Strategy<-NA
 mp.c25$Strategy<-paste('Partially relax May 9, testing=', mp.c0$testval, 'tests/day')
 c25p<-rbind(mp.c25[,c(1, 3, 6, 7, 17)], early.dist[,c(1, 2, 5, 6,7)])
 ggplot(data=c25p, aes(x=time, y=CriticalCare, group=sweepnum, color=factor(Strategy)))+
-    geom_line() +
-    xlab("Days since Jan 15, 2020") +
-    ylab("Critical care patients") +
-    scale_color_viridis_d(option="plasma", begin = 0.1, end = 0.9, direction = -1,
-                          name="Strategy")+
-    #labels=c("N/A", "No testing", "100,000", "1mil", "10mil")) +
-    scale_y_continuous(labels=comma) +
-    coord_cartesian(xlim=c(0, 365), ylim=c(0, 4e5)) +
-    geom_vline(xintercept = dates[c(1,3,4)], color = "grey60") +
-    geom_hline(yintercept=97776)+
-    #geom_text(aes(x = 200, label="Critical care bed capacity", y=3e5), color="grey60", size = 2) +
-    geom_text(aes(x = dates[1], label="\nGeneral distancing", y=2e5), color="grey60", angle=90, size = 2) +
-    geom_text(aes(x = dates[3], label="\nTesting", y=3e5), color="grey60", angle=90, size = 2) +
-    geom_text(aes(x = dates[4], label="\nOpen schools", y=3e5), color="grey60", angle=90, size = 2) +
-    ggtitle("c = 0.25") +
-    theme(plot.title = element_text(size = 8, face = "bold"),
-          legend.position = "none",
-          panel.background = element_rect(fill = "white", size = 0.5, linetype = "solid"),
-          axis.text=element_text(size=8),
-          axis.title=element_text(size=8),
-          axis.title.x = element_text(colour = "black", margin = margin(t = 10, r = 10, b = 0, l = 0)),
-          axis.title.y = element_text(colour = "black", margin = margin(t = 10, r = 10, b = 0, l = 0)),
-          axis.text.x = element_text(colour = "black", size = 8),
-          axis.text.y = element_text(colour = "black", size = 8),
-          axis.line.x = element_line(colour = 'black', size=0.25, linetype='solid'),
-          axis.line.y = element_line(colour = 'black', size=0.25, linetype='solid'),
-          axis.ticks.length=unit(.25, "cm")) -> fig3b.2
+  geom_line() +
+  xlab("Days since Jan 15, 2020") +
+  ylab("Critical care patients") +
+  scale_color_viridis_d(option="plasma", begin = 0.1, end = 0.9, direction = -1,
+                        name="Strategy")+
+  #labels=c("N/A", "No testing", "100,000", "1mil", "10mil")) +
+  scale_y_continuous(labels=comma) +
+  coord_cartesian(xlim=c(0, 365), ylim=c(0, 4e5)) +
+  geom_vline(xintercept = dates[c(1,3,4)], color = "grey60") +
+  geom_hline(yintercept=97776)+
+  #geom_text(aes(x = 200, label="Critical care bed capacity", y=3e5), color="grey60", size = 2) +
+  geom_text(aes(x = dates[1], label="\nGeneral distancing", y=2e5), color="grey60", angle=90, size = 2) +
+  geom_text(aes(x = dates[3], label="\nTesting", y=3e5), color="grey60", angle=90, size = 2) +
+  geom_text(aes(x = dates[4], label="\nOpen schools", y=3e5), color="grey60", angle=90, size = 2) +
+  ggtitle("c = 0.25") +
+  theme(plot.title = element_text(size = 8, face = "bold"),
+        legend.position = "none",
+        panel.background = element_rect(fill = "white", size = 0.5, linetype = "solid"),
+        axis.text=element_text(size=8),
+        axis.title=element_text(size=8),
+        axis.title.x = element_text(colour = "black", margin = margin(t = 10, r = 10, b = 0, l = 0)),
+        axis.title.y = element_text(colour = "black", margin = margin(t = 10, r = 10, b = 0, l = 0)),
+        axis.text.x = element_text(colour = "black", size = 8),
+        axis.text.y = element_text(colour = "black", size = 8),
+        axis.line.x = element_line(colour = 'black', size=0.25, linetype='solid'),
+        axis.line.y = element_line(colour = 'black', size=0.25, linetype='solid'),
+        axis.ticks.length=unit(.25, "cm")) -> fig3b.2
 
 mp.c50<-subset(model_time_plot, model_time_plot$cval == 0.5 & !(model_time_plot$testval==4*10^6))
 mp.c50$Strategy<-NA
@@ -1259,7 +1259,7 @@ fig3.optb <- ggarrange(fig3b.1, fig3b.2, fig3b.3, fig3b.4, fig3b.5, nrow = 3, nc
 ggsave(fig3.optb, file='/Users/aliciakraay/Dropbox/fig3_addref.pdf', 
        width = 6, height = 6, units = "in",  dpi = 300)
 
-  ##################
+##################
 model_time_plot %>%
   subset(cval == 0.25) %>%
   subset(!(testval==4*10^6)) %>%
@@ -1268,8 +1268,8 @@ model_time_plot %>%
   xlab("Days since Jan 15, 2020") +
   ylab(" ") +
   scale_color_viridis_d(option="plasma", begin = 0.1, end = 0.9, direction = -1,
-                      name="Daily testing rate",
-                      labels=c("No testing", "100,000", "1mil", "10mil")) +
+                        name="Daily testing rate",
+                        labels=c("No testing", "100,000", "1mil", "10mil")) +
   scale_y_continuous(labels=comma) +
   coord_cartesian(xlim=c(0, 365), ylim=c(0, 4e5)) +
   geom_vline(xintercept = dates[c(1,3,4)], color = "grey60") +
@@ -1298,8 +1298,8 @@ model_time_plot %>%
   xlab("Days since Jan 15, 2020") +
   ylab("Critical care patients") +
   scale_color_viridis_d(option="plasma", begin = 0.1, end = 0.9, direction = -1,
-                      name="Daily testing rate",
-                      labels=c("No testing", "100,000", "1mil", "10mil")) +
+                        name="Daily testing rate",
+                        labels=c("No testing", "100,000", "1mil", "10mil")) +
   scale_y_continuous(labels=comma) +
   coord_cartesian(xlim=c(0, 365), ylim=c(0, 4e5)) +
   geom_vline(xintercept = dates[c(1,3,4)], color = "grey60") +
@@ -1328,8 +1328,8 @@ model_time_plot %>%
   xlab("Days since Jan 15, 2020") +
   ylab(" ") +
   scale_color_viridis_d(option="plasma", begin = 0.1, end = 0.9, direction = -1,
-                      name="Daily testing rate",
-                      labels=c("No testing", "100,000", "1mil", "10mil")) +
+                        name="Daily testing rate",
+                        labels=c("No testing", "100,000", "1mil", "10mil")) +
   scale_y_continuous(labels=comma) +
   coord_cartesian(xlim=c(0, 365), ylim=c(0, 4e5)) +
   geom_vline(xintercept = dates[c(1,3,4)], color = "grey60") +
@@ -1358,8 +1358,8 @@ model_time_plot %>%
   xlab("Days since Jan 15, 2020") +
   ylab("Critical care patients") +
   scale_color_viridis_d(option="plasma", begin = 0.1, end = 0.9, direction = -1,
-                      name="Daily testing rate",
-                      labels=c("No testing", "100,000", "1mil", "10mil")) +
+                        name="Daily testing rate",
+                        labels=c("No testing", "100,000", "1mil", "10mil")) +
   scale_y_continuous(labels=comma) +
   coord_cartesian(xlim=c(0, 365), ylim=c(0, 4e5)) +
   geom_vline(xintercept = dates[c(1,3,4)], color = "grey60") +
