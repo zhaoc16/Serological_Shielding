@@ -52,7 +52,7 @@ pars['nTotSubComp'] = N * Nc
 # Epi Pars -----------------------------------------------------------------------------------------
 epiPars = {}
 
-epiPars['R0'] = 2.9
+epiPars['R0'] = 3.1
 epiPars['q'] = epiPars['R0']/63.28 # Probability of transmission from children
 epiPars['asymp_red'] = 0.55        # Relative infectiousness of asymptomatic vs symptomatic case
 
