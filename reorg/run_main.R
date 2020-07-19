@@ -1,3 +1,5 @@
+setwd('/Users/czhao/Documents/CYZ GITHUB/Weitz Group/COVID-19/Lopman COVID collab/Serological_Shielding/')
+#source('reorg/input')
 source('reorg/input_SD_Simulations.R')
 
 pars_doNothing = pars_default
