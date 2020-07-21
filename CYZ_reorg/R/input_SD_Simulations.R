@@ -1,5 +1,4 @@
 #General setup
-rm(list=ls()) #Clear workspace
 require(deSolve)
 require(ggplot2)
 require(reshape2)
