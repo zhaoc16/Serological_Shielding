@@ -1,3 +1,5 @@
+setwd('C://Users/czhao/Documents/CYZ GITHUB/Weitz Group/COVID-19/Lopman COVID collab/Serological_Shielding/Learning_MCMCs/')
+
 require(rstan)
 
 # options(mc.cores = parallel::detectCores())
